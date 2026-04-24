@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 import HlsPlayer from "@/components/HlsPlayer";
 
@@ -55,56 +55,202 @@ const GEROI_SEASON1 = [
   { ep: 26, title: "Блогер", videoId: "456239087" },
 ];
 
-const TV_SCHEDULE: Record<string, { time: string; title: string; channel: string }[]> = {
+interface ScheduleItem {
+  time: string;
+  title: string;
+  desc: string;
+  icon: string;
+  age: string;
+}
+
+const TV_SCHEDULE: Record<string, ScheduleItem[]> = {
+  "Первый канал": [
+    { time: "06:00", title: "Доброе утро", desc: "Утренняя информационно-развлекательная программа", icon: "☀️", age: "0+" },
+    { time: "09:00", title: "Новости", desc: "Актуальные события в России и мире", icon: "📰", age: "0+" },
+    { time: "09:15", title: "Контрольная закупка", desc: "Проверка качества товаров народного потребления", icon: "🛒", age: "0+" },
+    { time: "09:50", title: "Жить здорово!", desc: "Программа о здоровье с Еленой Малышевой", icon: "🏥", age: "0+" },
+    { time: "11:00", title: "Новости", desc: "Актуальные события в России и мире", icon: "📰", age: "0+" },
+    { time: "11:15", title: "Время покажет", desc: "Общественно-политическое ток-шоу", icon: "🎙️", age: "12+" },
+    { time: "13:00", title: "Новости", desc: "Актуальные события в России и мире", icon: "📰", age: "0+" },
+    { time: "13:15", title: "Давай поженимся!", desc: "Брачное ток-шоу с Ларисой Гузеевой", icon: "💍", age: "16+" },
+    { time: "14:00", title: "Мужское/Женское", desc: "Социальное ток-шоу", icon: "👫", age: "16+" },
+    { time: "15:00", title: "Новости", desc: "Актуальные события в России и мире", icon: "📰", age: "0+" },
+    { time: "15:15", title: "Жди меня", desc: "Программа поиска людей", icon: "🔍", age: "0+" },
+    { time: "16:00", title: "Мужское/Женское", desc: "Социальное ток-шоу", icon: "👫", age: "16+" },
+    { time: "18:00", title: "Вечерние новости", desc: "Главные события дня", icon: "🌆", age: "0+" },
+    { time: "18:35", title: "Давай поженимся!", desc: "Брачное ток-шоу с Ларисой Гузеевой", icon: "💍", age: "16+" },
+    { time: "19:50", title: "Пусть говорят", desc: "Ток-шоу с Дмитрием Борисовым", icon: "🎤", age: "16+" },
+    { time: "21:00", title: "Время", desc: "Главная информационная программа страны", icon: "🕘", age: "0+" },
+    { time: "21:30", title: "Художественный фильм", desc: "Премьера вечера", icon: "🎬", age: "12+" },
+    { time: "23:30", title: "Вечерний Ургант", desc: "Поздний вечерний выпуск с Иваном Ургантом", icon: "🎭", age: "16+" },
+  ],
   "Россия 1": [
-    { time: "06:00", title: "Утро России", channel: "Россия 1" },
-    { time: "09:00", title: "О самом главном", channel: "Россия 1" },
-    { time: "12:00", title: "Вести в 12:00", channel: "Россия 1" },
-    { time: "14:00", title: "Судьба человека", channel: "Россия 1" },
-    { time: "15:00", title: "Шоу Воли", channel: "Россия 1" },
-    { time: "18:00", title: "Вести в 18:00", channel: "Россия 1" },
-    { time: "20:00", title: "Вести недели", channel: "Россия 1" },
-    { time: "21:30", title: "Художественный фильм", channel: "Россия 1" },
+    { time: "05:00", title: "Утро России", desc: "Информационно-развлекательная программа", icon: "🌅", age: "0+" },
+    { time: "09:00", title: "О самом главном", desc: "Программа о здоровье и красоте", icon: "💊", age: "0+" },
+    { time: "10:00", title: "Вести", desc: "Информационная программа", icon: "📺", age: "0+" },
+    { time: "10:25", title: "Вести. Местное время", desc: "Региональные новости", icon: "🗺️", age: "0+" },
+    { time: "11:00", title: "По секрету всему свету", desc: "Семейное ток-шоу", icon: "🤫", age: "0+" },
+    { time: "12:00", title: "Вести в 12:00", desc: "Дневной выпуск новостей", icon: "📰", age: "0+" },
+    { time: "13:00", title: "Судьба человека", desc: "Социальное ток-шоу с Борисом Корчевниковым", icon: "👤", age: "12+" },
+    { time: "14:00", title: "60 минут", desc: "Общественно-политическое ток-шоу", icon: "⏱️", age: "12+" },
+    { time: "15:00", title: "Вести в 15:00", desc: "Дневной выпуск новостей", icon: "📰", age: "0+" },
+    { time: "16:00", title: "Прямой эфир", desc: "Ток-шоу с Михаилом Зеленским", icon: "📡", age: "16+" },
+    { time: "18:00", title: "Вести в 18:00", desc: "Вечерний выпуск новостей", icon: "🌆", age: "0+" },
+    { time: "19:00", title: "60 минут", desc: "Общественно-политическое ток-шоу", icon: "⏱️", age: "12+" },
+    { time: "20:00", title: "Вести в 20:00", desc: "Главный вечерний выпуск новостей", icon: "📺", age: "0+" },
+    { time: "21:05", title: "Вести. Местное время", desc: "Региональные новости", icon: "🗺️", age: "0+" },
+    { time: "21:20", title: "Российский сериал", desc: "Премьера сезона", icon: "🎞️", age: "12+" },
+    { time: "23:30", title: "Вечер с Владимиром Соловьёвым", desc: "Политическое ток-шоу", icon: "🎙️", age: "16+" },
   ],
   "НТВ": [
-    { time: "06:00", title: "НТВ Утром", channel: "НТВ" },
-    { time: "08:00", title: "Сегодня", channel: "НТВ" },
-    { time: "10:00", title: "Суд присяжных", channel: "НТВ" },
-    { time: "12:00", title: "Сегодня", channel: "НТВ" },
-    { time: "13:00", title: "Следствие вели...", channel: "НТВ" },
-    { time: "15:00", title: "Место встречи", channel: "НТВ" },
-    { time: "18:00", title: "Чрезвычайное происшествие", channel: "НТВ" },
-    { time: "19:00", title: "Сегодня", channel: "НТВ" },
-    { time: "21:00", title: "Криминальная Россия", channel: "НТВ" },
+    { time: "05:55", title: "НТВ Утром", desc: "Утренняя информационная программа", icon: "🌤️", age: "0+" },
+    { time: "08:00", title: "Сегодня", desc: "Новости НТВ", icon: "📰", age: "0+" },
+    { time: "08:25", title: "Суд присяжных", desc: "Юридическая программа", icon: "⚖️", age: "12+" },
+    { time: "10:00", title: "Сегодня", desc: "Новости НТВ", icon: "📰", age: "0+" },
+    { time: "10:25", title: "ДНК", desc: "Ток-шоу об установлении родства", icon: "🧬", age: "12+" },
+    { time: "12:00", title: "Сегодня в 12:00", desc: "Дневной выпуск новостей", icon: "📰", age: "0+" },
+    { time: "13:00", title: "Следствие вели…", desc: "Криминальные истории с Леонидом Каневским", icon: "🔎", age: "12+" },
+    { time: "15:00", title: "Сегодня в 15:00", desc: "Дневной выпуск новостей", icon: "📰", age: "0+" },
+    { time: "15:25", title: "Место встречи", desc: "Общественно-политическое ток-шоу", icon: "🤝", age: "12+" },
+    { time: "18:00", title: "Чрезвычайное происшествие", desc: "Криминальная хроника дня", icon: "🚨", age: "16+" },
+    { time: "19:00", title: "Сегодня в 19:00", desc: "Вечерний выпуск новостей", icon: "🌆", age: "0+" },
+    { time: "20:00", title: "Сегодня. Итоговая программа", desc: "Главные события дня", icon: "📺", age: "0+" },
+    { time: "21:00", title: "Криминальная Россия", desc: "Документальный криминальный сериал", icon: "👮", age: "16+" },
+    { time: "22:00", title: "Российский детектив", desc: "Премьерный сериал", icon: "🕵️", age: "16+" },
+  ],
+  "Россия 24": [
+    { time: "00:00", title: "Новости", desc: "Круглосуточное информационное вещание", icon: "📡", age: "0+" },
+    { time: "07:00", title: "Утро. Россия 24", desc: "Утренний информационный блок", icon: "🌅", age: "0+" },
+    { time: "09:00", title: "Новости", desc: "Актуальные события каждые 30 минут", icon: "📰", age: "0+" },
+    { time: "10:00", title: "Специальный репортаж", desc: "Документальные расследования", icon: "🎥", age: "0+" },
+    { time: "11:00", title: "Новости", desc: "Актуальные события", icon: "📰", age: "0+" },
+    { time: "12:00", title: "Полдень. Россия 24", desc: "Дневной информационный блок", icon: "☀️", age: "0+" },
+    { time: "14:00", title: "Новости", desc: "Актуальные события", icon: "📰", age: "0+" },
+    { time: "15:00", title: "Документальный фильм", desc: "Познавательный документальный цикл", icon: "📽️", age: "0+" },
+    { time: "17:00", title: "Новости", desc: "Актуальные события", icon: "📰", age: "0+" },
+    { time: "18:00", title: "Вечер. Россия 24", desc: "Вечерний информационный блок", icon: "🌆", age: "0+" },
+    { time: "20:00", title: "Главное", desc: "Итоги дня с ведущими Россия 24", icon: "🎙️", age: "0+" },
+    { time: "21:00", title: "Новости", desc: "Поздний вечерний выпуск", icon: "🌙", age: "0+" },
+    { time: "22:00", title: "Специальный репортаж", desc: "Документальные расследования", icon: "🎥", age: "0+" },
+    { time: "23:00", title: "Новости", desc: "Ночной выпуск", icon: "🌙", age: "0+" },
+  ],
+  "Пятый канал": [
+    { time: "06:00", title: "Сейчас утром", desc: "Утренняя информационная программа", icon: "🌤️", age: "0+" },
+    { time: "07:00", title: "Утро на 5", desc: "Новости и события", icon: "☀️", age: "0+" },
+    { time: "09:00", title: "Место происшествия", desc: "Криминальные новости", icon: "🚓", age: "12+" },
+    { time: "09:30", title: "Следствие вели…", desc: "Документальные детективные истории", icon: "🔍", age: "12+" },
+    { time: "12:30", title: "Сейчас", desc: "Дневной выпуск новостей", icon: "📰", age: "0+" },
+    { time: "13:00", title: "Детективы", desc: "Российский детективный сериал", icon: "🕵️", age: "12+" },
+    { time: "16:30", title: "Место происшествия", desc: "Криминальная хроника", icon: "🚨", age: "12+" },
+    { time: "17:00", title: "Сейчас", desc: "Вечерний выпуск новостей", icon: "📰", age: "0+" },
+    { time: "17:30", title: "Детективы", desc: "Российский детективный сериал", icon: "🕵️", age: "12+" },
+    { time: "20:00", title: "Сейчас в 20:00", desc: "Главный вечерний выпуск новостей", icon: "🌆", age: "0+" },
+    { time: "20:30", title: "Российский сериал", desc: "Вечерний сериал", icon: "🎞️", age: "12+" },
+    { time: "22:30", title: "Место происшествия. О главном", desc: "Итоговая криминальная хроника", icon: "🚓", age: "16+" },
+    { time: "23:00", title: "Сейчас", desc: "Ночной выпуск", icon: "🌙", age: "0+" },
+  ],
+  "РЕН ТВ": [
+    { time: "05:00", title: "Добров в эфире", desc: "Ночное ток-шоу с Андреем Добровым", icon: "🌙", age: "16+" },
+    { time: "07:00", title: "Экстренный вызов", desc: "Утренняя криминальная хроника", icon: "🚨", age: "16+" },
+    { time: "08:00", title: "Новости 112", desc: "Утренние новости РЕН ТВ", icon: "📰", age: "0+" },
+    { time: "09:00", title: "Документальный фильм", desc: "Тайны и загадки мироздания", icon: "🔮", age: "12+" },
+    { time: "11:00", title: "Экстренный вызов", desc: "Дневная криминальная хроника", icon: "🚨", age: "16+" },
+    { time: "12:00", title: "Информационная программа «112»", desc: "Дневной выпуск", icon: "📰", age: "0+" },
+    { time: "13:00", title: "Засекреченные списки", desc: "Документальный цикл расследований", icon: "📋", age: "12+" },
+    { time: "14:00", title: "Великие тайны", desc: "Документальные фильмы о загадках истории", icon: "🏺", age: "0+" },
+    { time: "16:00", title: "Экстренный вызов", desc: "Вечерняя криминальная хроника", icon: "🚨", age: "16+" },
+    { time: "17:00", title: "Новости 112", desc: "Вечерние новости", icon: "📰", age: "0+" },
+    { time: "17:30", title: "Добров в эфире", desc: "Актуальное ток-шоу с Андреем Добровым", icon: "🎙️", age: "16+" },
+    { time: "19:00", title: "Новости 112", desc: "Главный вечерний выпуск", icon: "🌆", age: "0+" },
+    { time: "21:00", title: "Смотреть всем!", desc: "Остросюжетное ток-шоу", icon: "👁️", age: "16+" },
+    { time: "23:00", title: "Новости 112", desc: "Ночной выпуск", icon: "🌙", age: "0+" },
   ],
   "СТС": [
-    { time: "07:00", title: "Мультфильмы", channel: "СТС" },
-    { time: "09:00", title: "Кино в выходной", channel: "СТС" },
-    { time: "11:00", title: "Воронины", channel: "СТС" },
-    { time: "13:00", title: "Молодёжка", channel: "СТС" },
-    { time: "15:00", title: "Кухня", channel: "СТС" },
-    { time: "17:00", title: "Воронины", channel: "СТС" },
-    { time: "19:00", title: "Корабль", channel: "СТС" },
-    { time: "21:00", title: "Премьерный сериал", channel: "СТС" },
+    { time: "06:00", title: "Три кота", desc: "Мультсериал для детей 0+", icon: "🐱", age: "0+" },
+    { time: "06:30", title: "Барбоскины", desc: "Семейный мультсериал 0+", icon: "🐕", age: "0+" },
+    { time: "07:00", title: "Турбозавры", desc: "Детский мультсериал", icon: "🦕", age: "0+" },
+    { time: "07:30", title: "Смешарики", desc: "Знаменитый отечественный мультсериал", icon: "⭕", age: "0+" },
+    { time: "08:00", title: "Кухня", desc: "Популярная комедийная серия о ресторане", icon: "👨‍🍳", age: "12+" },
+    { time: "10:00", title: "Воронины", desc: "Семейная комедия о большой семье", icon: "👨‍👩‍👧‍👦", age: "0+" },
+    { time: "12:00", title: "СТС Love", desc: "Романтические истории", icon: "💕", age: "12+" },
+    { time: "14:00", title: "Молодёжка", desc: "Сериал о хоккейной команде", icon: "🏒", age: "12+" },
+    { time: "16:00", title: "Кухня", desc: "Комедийный сериал", icon: "👨‍🍳", age: "12+" },
+    { time: "18:00", title: "Воронины", desc: "Семейная комедия", icon: "👨‍👩‍👧‍👦", age: "0+" },
+    { time: "20:00", title: "Этот вечер. СТС", desc: "Вечерний блок программ", icon: "🌇", age: "12+" },
+    { time: "21:00", title: "Премьерный сериал", desc: "Новый сезон на СТС", icon: "🎬", age: "12+" },
+    { time: "23:00", title: "Кино на СТС", desc: "Художественный фильм", icon: "🎥", age: "16+" },
   ],
   "ТНТ": [
-    { time: "07:00", title: "Счастливы вместе", channel: "ТНТ" },
-    { time: "09:00", title: "Универ", channel: "ТНТ" },
-    { time: "11:00", title: "САШАТАНЯ", channel: "ТНТ" },
-    { time: "13:00", title: "Интерны", channel: "ТНТ" },
-    { time: "15:00", title: "Физрук", channel: "ТНТ" },
-    { time: "17:00", title: "Полицейский с Рублёвки", channel: "ТНТ" },
-    { time: "19:30", title: "Иванько", channel: "ТНТ" },
-    { time: "21:00", title: "Stand Up", channel: "ТНТ" },
+    { time: "06:00", title: "Счастливы вместе", desc: "Комедийный сериал о семье Букиных", icon: "😄", age: "16+" },
+    { time: "07:00", title: "Универ", desc: "Молодёжный комедийный сериал", icon: "🎓", age: "16+" },
+    { time: "09:00", title: "Универ. Новая общага", desc: "Продолжение популярного сериала", icon: "🏠", age: "16+" },
+    { time: "10:30", title: "САШАТАНЯ", desc: "Семейная комедия о молодожёнах", icon: "💑", age: "12+" },
+    { time: "12:00", title: "Дом-2. Lite", desc: "Реалити-шоу о любви и отношениях", icon: "❤️", age: "16+" },
+    { time: "13:00", title: "Интерны", desc: "Комедийный сериал о врачах", icon: "🏥", age: "16+" },
+    { time: "14:00", title: "Реальные пацаны", desc: "Комедийный сериал о жизни в Перми", icon: "👊", age: "16+" },
+    { time: "15:30", title: "Физрук", desc: "Комедийный сериал с Нагиевым", icon: "💪", age: "16+" },
+    { time: "17:00", title: "Полицейский с Рублёвки", desc: "Комедийный сериал о полицейском", icon: "🚔", age: "16+" },
+    { time: "18:30", title: "Дом-2. Город любви", desc: "Реалити-шоу — прямой эфир", icon: "🏡", age: "16+" },
+    { time: "20:00", title: "Большое кино", desc: "Голливудский блокбастер вечера", icon: "🎬", age: "12+" },
+    { time: "21:30", title: "Иванько", desc: "Хитовый комедийный сериал ТНТ", icon: "😂", age: "16+" },
+    { time: "23:00", title: "Stand Up", desc: "Вечер юмора на ТНТ", icon: "🎤", age: "18+" },
+  ],
+  "Культура": [
+    { time: "06:30", title: "Сигнал точного времени", desc: "", icon: "⏰", age: "0+" },
+    { time: "07:00", title: "Новости культуры", desc: "Культурная жизнь России и мира", icon: "🎭", age: "0+" },
+    { time: "07:35", title: "Пешком…", desc: "Документальный цикл о городах России", icon: "🚶", age: "0+" },
+    { time: "08:00", title: "Большая опера", desc: "Оперные постановки ведущих театров", icon: "🎼", age: "0+" },
+    { time: "10:00", title: "Новости культуры", desc: "Культурная жизнь России и мира", icon: "🎭", age: "0+" },
+    { time: "10:15", title: "Документальный фильм", desc: "Познавательный фильм о культуре", icon: "📽️", age: "0+" },
+    { time: "11:30", title: "Библейский сюжет", desc: "Христианская культура в искусстве", icon: "✝️", age: "0+" },
+    { time: "12:00", title: "Новости культуры", desc: "Дневной выпуск", icon: "🎭", age: "0+" },
+    { time: "12:15", title: "Линия жизни", desc: "Беседы с выдающимися людьми", icon: "🎙️", age: "0+" },
+    { time: "13:10", title: "Балет", desc: "Трансляция из Большого театра", icon: "🩰", age: "0+" },
+    { time: "15:00", title: "Новости культуры", desc: "Дневной выпуск", icon: "🎭", age: "0+" },
+    { time: "16:00", title: "Абсолютный слух", desc: "Программа о классической музыке", icon: "🎵", age: "0+" },
+    { time: "17:00", title: "Мировые сокровища культуры", desc: "Шедевры мировой живописи", icon: "🖼️", age: "0+" },
+    { time: "18:00", title: "Новости культуры", desc: "Вечерний выпуск", icon: "🌆", age: "0+" },
+    { time: "18:15", title: "Спокойной ночи, малыши!", desc: "Легендарная детская передача с 1964 года", icon: "🌙", age: "0+" },
+    { time: "18:30", title: "Главная роль", desc: "Беседы с мастерами театра и кино", icon: "🎭", age: "0+" },
+    { time: "19:30", title: "Черные дыры. Белые пятна", desc: "Научно-познавательная программа", icon: "🌌", age: "0+" },
+    { time: "20:10", title: "Правила жизни", desc: "Документальный цикл", icon: "📖", age: "0+" },
+    { time: "20:30", title: "Новости культуры", desc: "Вечерний выпуск", icon: "🎭", age: "0+" },
+    { time: "20:45", title: "Концерт", desc: "Вечер классической музыки", icon: "🎻", age: "0+" },
+    { time: "23:00", title: "Искусственный отбор", desc: "Программа о современном искусстве", icon: "🎨", age: "0+" },
   ],
   "Матч ТВ": [
-    { time: "07:00", title: "Утренняя зарядка", channel: "Матч ТВ" },
-    { time: "08:00", title: "Все на Матч!", channel: "Матч ТВ" },
-    { time: "10:00", title: "Футбол. Чемпионат России", channel: "Матч ТВ" },
-    { time: "12:30", title: "Хоккей. КХЛ", channel: "Матч ТВ" },
-    { time: "15:00", title: "Формула 1", channel: "Матч ТВ" },
-    { time: "18:00", title: "Футбол. Лига чемпионов", channel: "Матч ТВ" },
-    { time: "21:00", title: "Бокс. Вечер чемпионов", channel: "Матч ТВ" },
+    { time: "06:00", title: "Все на Матч!", desc: "Утреннее спортивное ток-шоу", icon: "☀️", age: "0+" },
+    { time: "08:00", title: "Специальный репортаж", desc: "Спортивные расследования и документалки", icon: "📋", age: "0+" },
+    { time: "09:00", title: "Формула 1. Практика", desc: "Тренировочные заезды Гран-При", icon: "🏎️", age: "0+" },
+    { time: "11:00", title: "Футбол. ЦСКА — Зенит", desc: "Чемпионат России. Прямая трансляция", icon: "⚽", age: "0+" },
+    { time: "13:00", title: "Все на Матч!", desc: "Дневное спортивное ток-шоу", icon: "🎤", age: "0+" },
+    { time: "14:00", title: "Хоккей. КХЛ", desc: "Прямая трансляция матча КХЛ", icon: "🏒", age: "0+" },
+    { time: "17:00", title: "Теннис. Roland Garros", desc: "Открытый чемпионат Франции. Прямой эфир", icon: "🎾", age: "0+" },
+    { time: "19:00", title: "Футбол. Лига чемпионов", desc: "1/4 финала. Прямая трансляция UEFA", icon: "🏆", age: "0+" },
+    { time: "21:30", title: "Все на Матч!", desc: "Вечернее спортивное ток-шоу. Итоги дня", icon: "🌆", age: "0+" },
+    { time: "22:30", title: "Бокс. Вечер чемпионов", desc: "Чемпионский бой. Прямая трансляция", icon: "🥊", age: "12+" },
+  ],
+  "Карусель": [
+    { time: "01:00", title: "Приключения Пети и Волка", desc: "Анимационный сериал 12+ · Дело о Нечаянном проклятии — Дело о Тараканах", icon: "🐺", age: "12+" },
+    { time: "02:30", title: "Маша и Медведь", desc: "Любимый мультсериал 0+ · Кушать подано! — Чудо в перьях — Спасайся кто может!", icon: "🐻", age: "0+" },
+    { time: "04:00", title: "Маша и Медведь. Песенки для малышей", desc: "Музыкальные серии 0+ · Бинго", icon: "🎵", age: "0+" },
+    { time: "04:05", title: "Маша и Медведь", desc: "0+ · Дочки-матери — Унесённый ветром — Впервые на арене — Вот так штука!", icon: "🐻", age: "0+" },
+    { time: "05:00", title: "Лунтик", desc: "Добрый мультсериал для малышей 0+ · Туземцы — Тема для поэмы — Потоп — Ленивый жучок", icon: "🌙", age: "0+" },
+    { time: "07:00", title: "С добрым утром, малыши!", desc: "Утренняя программа 0+ — Герои «Спокойной ночи, малыши!» будят каждого ребёнка в детский сад", icon: "🌅", age: "0+" },
+    { time: "07:25", title: "Погода", desc: "Актуальный прогноз погоды от ведущих «Спокойной ночи, малыши!»", icon: "🌤️", age: "0+" },
+    { time: "07:30", title: "Ум и Хрум", desc: "Российский мультсериал 0+ · Рыцарь — Пахучий случай — Чёрная дыра — Строитель — Хрумолёт", icon: "🧠", age: "0+" },
+    { time: "10:45", title: "Студия Каляки-Маляки", desc: "Детская творческая программа 0+ · Оркестр кактусов", icon: "🎨", age: "0+" },
+    { time: "11:10", title: "Буба", desc: "Анимационный сериал 6+ · Кухня — Ванная комната — Детская комната — Кабинет", icon: "🎪", age: "6+" },
+    { time: "13:45", title: "Инфинити Надо", desc: "Анимационный сериал 6+ · Принц Гарольд — Самый сильный в клане Огня", icon: "🔥", age: "6+" },
+    { time: "14:15", title: "Минифорс. Сила динозавров", desc: "Анимационный сериал 6+ · Решающее сражение", icon: "🦕", age: "6+" },
+    { time: "14:30", title: "Навигатор. У нас гости!", desc: "Еженедельное приложение к программе «Навигатор. Новости»", icon: "🧭", age: "0+" },
+    { time: "14:35", title: "Погода", desc: "Актуальный прогноз погоды", icon: "🌤️", age: "0+" },
+    { time: "14:40", title: "Фиксики. Дай пять!", desc: "Познавательный мультсериал 0+ · Лошадиные силы — Принцесса — Марсоход — Бабочка — Рыцарь", icon: "🔧", age: "0+" },
+    { time: "17:30", title: "Лео и Тиг", desc: "Природоведческий мультсериал 0+ · Шкура солнца — Таинственная пещера — Таёжная сказка", icon: "🐯", age: "0+" },
+    { time: "21:00", title: "Спокойной ночи, малыши!", desc: "Легендарная передача с 1964 года 0+", icon: "🌙", age: "0+" },
+    { time: "21:15", title: "Маша и Медведь", desc: "0+ · Колесо дружбы — Три пятачка — Вишенка на торте — Что ты ешь?", icon: "🐻", age: "0+" },
+    { time: "23:00", title: "Дикие Скричеры!", desc: "Анимационный сериал 6+ · Иллюзия финала", icon: "😱", age: "6+" },
+    { time: "23:15", title: "Приключения Пети и Волка", desc: "12+ · Дело Рыб и их будущего — Дело о Невидимках — Дело о Прирождённом победителе", icon: "🐺", age: "12+" },
   ],
 };
 
@@ -115,8 +261,14 @@ export default function Index() {
   const [selectedEpisode, setSelectedEpisode] = useState<{ ep: number; title: string; videoId: string } | null>(null);
   const [selectedChannel, setSelectedChannel] = useState<typeof TV_CHANNELS[0] | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<1 | 2>(1);
-  const [scheduleChannel, setScheduleChannel] = useState("Россия 1");
+  const [scheduleChannel, setScheduleChannel] = useState("Первый канал");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   const navItems: { id: Section; label: string; icon: string }[] = [
     { id: "home", label: "Главная", icon: "Home" },
@@ -125,7 +277,9 @@ export default function Index() {
     { id: "schedule", label: "Программа передач", icon: "CalendarDays" },
   ];
 
-  const currentHour = new Date().getHours();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const currentTotal = currentHour * 60 + currentMinute;
 
   return (
     <div className="min-h-screen bg-background text-foreground font-golos">
@@ -586,77 +740,112 @@ export default function Index() {
         {/* ===== SCHEDULE ===== */}
         {activeSection === "schedule" && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-1 h-8 rounded-full" style={{ background: "linear-gradient(to bottom, #a855f7, #3b82f6)" }} />
-                <h1 className="font-montserrat font-black text-3xl text-white">Программа передач</h1>
+
+            {/* Header + живые часы */}
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="w-1 h-8 rounded-full" style={{ background: "linear-gradient(to bottom, #a855f7, #3b82f6)" }} />
+                  <h1 className="font-montserrat font-black text-3xl text-white">Программа передач</h1>
+                </div>
+                <p className="text-gray-400 ml-4 text-sm capitalize">
+                  {now.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}
+                </p>
               </div>
-              <p className="text-gray-400 ml-4 text-sm">
-                {new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-              </p>
+              {/* Живые часы */}
+              <div className="ml-4 sm:ml-0 rounded-2xl px-6 py-3 text-center flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(59,130,246,0.15))", border: "1px solid rgba(168,85,247,0.25)" }}>
+                <div className="text-gray-400 text-xs mb-0.5">Сейчас</div>
+                <div className="font-montserrat font-black text-white text-3xl tabular-nums tracking-tight">
+                  {String(now.getHours()).padStart(2, "0")}:{String(now.getMinutes()).padStart(2, "0")}
+                  <span className="text-purple-400 text-xl">:{String(now.getSeconds()).padStart(2, "0")}</span>
+                </div>
+                <div className="text-gray-500 text-xs mt-0.5">Москва</div>
+              </div>
             </div>
 
             {/* Channel tabs */}
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-4 mb-6">
-              {Object.keys(TV_SCHEDULE).map((ch) => (
-                <button
-                  key={ch}
-                  onClick={() => setScheduleChannel(ch)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                    scheduleChannel === ch ? "text-white neon-glow-purple" : "glass text-gray-400 hover:text-white"
-                  }`}
-                  style={scheduleChannel === ch ? { background: "linear-gradient(135deg, #7c3aed, #a855f7)" } : {}}
-                >
-                  {ch}
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-2">
-              {TV_SCHEDULE[scheduleChannel]?.map((item, i) => {
-                const itemHour = parseInt(item.time.split(":")[0]);
-                const nextHour = TV_SCHEDULE[scheduleChannel][i + 1]
-                  ? parseInt(TV_SCHEDULE[scheduleChannel][i + 1].time.split(":")[0])
-                  : 24;
-                const isNow = currentHour >= itemHour && currentHour < nextHour;
-
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3 mb-6">
+              {Object.keys(TV_SCHEDULE).map((ch) => {
+                const chData = TV_CHANNELS.find(c => c.name === ch);
                 return (
-                  <div
-                    key={i}
-                    className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
-                      isNow ? "border border-orange-500/40" : "card-glow"
+                  <button
+                    key={ch}
+                    onClick={() => setScheduleChannel(ch)}
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
+                      scheduleChannel === ch ? "text-white" : "glass text-gray-400 hover:text-white"
                     }`}
-                    style={isNow ? { background: "linear-gradient(135deg, rgba(255,92,26,0.12), rgba(168,85,247,0.06))", boxShadow: "0 0 20px rgba(255,92,26,0.2)" } : {}}
+                    style={scheduleChannel === ch ? { background: "linear-gradient(135deg, #7c3aed, #a855f7)", boxShadow: "0 0 16px rgba(168,85,247,0.4)" } : {}}
                   >
-                    <div className="w-16 flex-shrink-0 text-center">
-                      <span className={`font-montserrat font-bold text-base ${isNow ? "text-orange-400" : "text-gray-500"}`}>
-                        {item.time}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-white font-medium text-sm sm:text-base">{item.title}</span>
-                        {isNow && (
-                          <span className="flex items-center gap-1 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                            СЕЙЧАС
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-gray-500 text-xs mt-0.5">{item.channel}</div>
-                    </div>
-                  </div>
+                    {chData && <span>{chData.emoji}</span>}
+                    {ch}
+                  </button>
                 );
               })}
             </div>
 
-            <div className="mt-6 p-4 rounded-2xl glass border border-purple-500/10">
-              <div className="flex items-start gap-3">
-                <Icon name="Info" size={16} className="text-purple-400 mt-0.5 flex-shrink-0" />
-                <p className="text-gray-400 text-sm">
-                  Программа передач для всех каналов будет добавлена позже. Сейчас доступны: Россия 1, НТВ, СТС, ТНТ и Матч ТВ.
-                </p>
-              </div>
+            {/* Список передач */}
+            <div className="space-y-2">
+              {TV_SCHEDULE[scheduleChannel]?.map((item, i) => {
+                const [h, m] = item.time.split(":").map(Number);
+                const itemTotal = h * 60 + m;
+                const nextItem = TV_SCHEDULE[scheduleChannel][i + 1];
+                const [nh, nm] = nextItem ? nextItem.time.split(":").map(Number) : [24, 0];
+                const nextTotal = nh * 60 + nm;
+                const isNow = currentTotal >= itemTotal && currentTotal < nextTotal;
+                const isPast = currentTotal >= nextTotal;
+
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-start gap-4 p-4 rounded-2xl transition-all ${isPast && !isNow ? "opacity-50" : ""}`}
+                    style={isNow
+                      ? { background: "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.06))", border: "1px solid rgba(34,197,94,0.35)", boxShadow: "0 0 20px rgba(34,197,94,0.15)" }
+                      : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }
+                    }
+                  >
+                    {/* Время */}
+                    <div className="w-14 flex-shrink-0 pt-0.5">
+                      <span className={`font-montserrat font-bold text-base tabular-nums ${isNow ? "text-green-400" : isPast ? "text-gray-600" : "text-gray-300"}`}>
+                        {item.time}
+                      </span>
+                    </div>
+
+                    {/* Иконка */}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                      style={isNow
+                        ? { background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)" }
+                        : { background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }
+                      }
+                    >
+                      {item.icon}
+                    </div>
+
+                    {/* Контент */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <span className={`font-montserrat font-bold text-sm sm:text-base ${isNow ? "text-white" : isPast ? "text-gray-500" : "text-gray-100"}`}>
+                          {item.title}
+                        </span>
+                        <span className="text-gray-600 text-xs border border-gray-700 px-1.5 py-0.5 rounded">{item.age}</span>
+                        {isNow && (
+                          <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full"
+                            style={{ background: "rgba(34,197,94,0.2)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.4)" }}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                            СЕЙЧАС В ЭФИРЕ
+                          </span>
+                        )}
+                      </div>
+                      {item.desc && (
+                        <p className={`text-xs leading-relaxed line-clamp-2 ${isNow ? "text-gray-300" : "text-gray-600"}`}>
+                          {item.desc}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
