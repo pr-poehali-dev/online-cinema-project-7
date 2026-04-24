@@ -20,33 +20,37 @@ const TV_CHANNELS = [
   { id: 11, name: "ТВК", emoji: "📻", color: "#e76f51", desc: "Региональное вещание" },
 ];
 
+function vkEmbed(videoId: string): string {
+  return `https://vk.com/video_ext.php?oid=-234589463&id=${videoId}&hd=2&autoplay=1`;
+}
+
 const GEROI_SEASON1 = [
-  { ep: 1, title: "Новые герои", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239052?from=video&linked=1&t=4s" },
-  { ep: 2, title: "Плохая примета", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239053?from=video&linked=1" },
-  { ep: 3, title: "Лунная гонка", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239054?from=video&linked=1" },
-  { ep: 4, title: "Идеальный друг", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239055?from=video&linked=1&t=5s" },
-  { ep: 5, title: "Флаг для Генерала", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239056?from=video&linked=1&t=26s" },
-  { ep: 6, title: "Таинственная коробка", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239057?from=video&linked=1&t=15s" },
-  { ep: 7, title: "Сладкая миссия", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239058?from=video&linked=1&t=1m43s" },
-  { ep: 8, title: "Супергерой", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239059?from=video&linked=1" },
-  { ep: 9, title: "Метод Флая", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239060?from=video&linked=1" },
-  { ep: 10, title: "За фантазию", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239063?from=video&linked=1" },
-  { ep: 11, title: "Любимая игрушка", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239065?from=video&linked=1" },
-  { ep: 12, title: "Эмблема команды", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239070?from=video&linked=1" },
-  { ep: 13, title: "Премия Пинки", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239068?from=video&linked=1" },
-  { ep: 14, title: "Секрет Де-Кроля", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239071?from=video&linked=1" },
-  { ep: 15, title: "Одиссея Бублика", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239072?from=video&linked=1" },
-  { ep: 16, title: "Возвращение Пинки", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239073?from=video&linked=1" },
-  { ep: 17, title: "Одиночество Бублика", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239074?from=video&linked=1&t=2m21s" },
-  { ep: 18, title: "Страшный праздник", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239080?from=video&linked=1" },
-  { ep: 19, title: "Хвост О-Раша", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239075?from=video&linked=1" },
-  { ep: 20, title: "История Ко-Ко", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239076?from=video&linked=1&t=32s" },
-  { ep: 21, title: "Конкурс точилок", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239077?from=video&linked=1" },
-  { ep: 22, title: "Другая Глория", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239079?from=video&linked=1" },
-  { ep: 23, title: "Мелкотрон Крузо", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239082?from=video&linked=1" },
-  { ep: 24, title: "История Бублика", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239083?from=video&linked=1&t=3m10s" },
-  { ep: 25, title: "Жаркий четверг", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239085?from=video&linked=1" },
-  { ep: 26, title: "Блогер", url: "https://m.vkvideo.ru/playlist/-234589463_5/video-234589463_456239087?from=video&linked=1" },
+  { ep: 1, title: "Новые герои", videoId: "456239052" },
+  { ep: 2, title: "Плохая примета", videoId: "456239053" },
+  { ep: 3, title: "Лунная гонка", videoId: "456239054" },
+  { ep: 4, title: "Идеальный друг", videoId: "456239055" },
+  { ep: 5, title: "Флаг для Генерала", videoId: "456239056" },
+  { ep: 6, title: "Таинственная коробка", videoId: "456239057" },
+  { ep: 7, title: "Сладкая миссия", videoId: "456239058" },
+  { ep: 8, title: "Супергерой", videoId: "456239059" },
+  { ep: 9, title: "Метод Флая", videoId: "456239060" },
+  { ep: 10, title: "За фантазию", videoId: "456239063" },
+  { ep: 11, title: "Любимая игрушка", videoId: "456239065" },
+  { ep: 12, title: "Эмблема команды", videoId: "456239070" },
+  { ep: 13, title: "Премия Пинки", videoId: "456239068" },
+  { ep: 14, title: "Секрет Де-Кроля", videoId: "456239071" },
+  { ep: 15, title: "Одиссея Бублика", videoId: "456239072" },
+  { ep: 16, title: "Возвращение Пинки", videoId: "456239073" },
+  { ep: 17, title: "Одиночество Бублика", videoId: "456239074" },
+  { ep: 18, title: "Страшный праздник", videoId: "456239080" },
+  { ep: 19, title: "Хвост О-Раша", videoId: "456239075" },
+  { ep: 20, title: "История Ко-Ко", videoId: "456239076" },
+  { ep: 21, title: "Конкурс точилок", videoId: "456239077" },
+  { ep: 22, title: "Другая Глория", videoId: "456239079" },
+  { ep: 23, title: "Мелкотрон Крузо", videoId: "456239082" },
+  { ep: 24, title: "История Бублика", videoId: "456239083" },
+  { ep: 25, title: "Жаркий четверг", videoId: "456239085" },
+  { ep: 26, title: "Блогер", videoId: "456239087" },
 ];
 
 const TV_SCHEDULE: Record<string, { time: string; title: string; channel: string }[]> = {
@@ -106,7 +110,7 @@ type Section = "home" | "tv" | "cartoons" | "schedule";
 
 export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>("home");
-  const [selectedEpisode, setSelectedEpisode] = useState<{ ep: number; title: string; url: string } | null>(null);
+  const [selectedEpisode, setSelectedEpisode] = useState<{ ep: number; title: string; videoId: string } | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<1 | 2>(1);
   const [scheduleChannel, setScheduleChannel] = useState("Россия 1");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -359,7 +363,7 @@ export default function Index() {
                 style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)" }}
                 onClick={(e) => { if (e.target === e.currentTarget) setSelectedEpisode(null); }}
               >
-                <div className="w-full max-w-lg animate-scale-in">
+                <div className="w-full max-w-4xl animate-scale-in">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <div className="text-gray-400 text-sm mb-1">Геройчики · Серия {selectedEpisode.ep}</div>
@@ -373,46 +377,17 @@ export default function Index() {
                     </button>
                   </div>
 
-                  {/* Карточка серии */}
-                  <div
-                    className="rounded-2xl overflow-hidden relative group cursor-pointer"
-                    style={{ background: "linear-gradient(135deg, #0d1b2a, #1a0a2e)", border: "1px solid rgba(255,92,26,0.2)" }}
-                    onClick={() => window.open(selectedEpisode.url, "_blank")}
-                  >
-                    <div className="relative h-56 overflow-hidden">
-                      <img
-                        src={GEROI_IMG}
-                        alt={selectedEpisode.title}
-                        className="w-full h-full object-cover object-top opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
-                      />
-                      <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)" }} />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div
-                          className="w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform neon-glow"
-                          style={{ background: "linear-gradient(135deg, #ff5c1a, #ff8c42)" }}
-                        >
-                          <Icon name="Play" size={32} className="text-white ml-1" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <div className="text-orange-400 text-xs font-medium mb-1">Серия {selectedEpisode.ep}</div>
-                        <div className="text-white font-montserrat font-bold text-lg">{selectedEpisode.title}</div>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="bg-orange-500/20 text-orange-300 text-xs px-2 py-0.5 rounded-full border border-orange-500/30">ВКонтакте Видео</span>
-                        <span className="text-gray-500 text-xs">Геройчики · 1 сезон</span>
-                      </div>
-                      <button
-                        className="w-full py-3 rounded-xl font-montserrat font-bold text-white text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02] neon-glow"
-                        style={{ background: "linear-gradient(135deg, #ff5c1a, #a855f7)" }}
-                        onClick={(e) => { e.stopPropagation(); window.open(selectedEpisode.url, "_blank"); }}
-                      >
-                        <Icon name="ExternalLink" size={16} />
-                        Смотреть на VK Video
-                      </button>
-                    </div>
+                  {/* VK embed плеер */}
+                  <div className="rounded-2xl overflow-hidden bg-black" style={{ aspectRatio: "16/9" }}>
+                    <iframe
+                      key={selectedEpisode.videoId}
+                      src={vkEmbed(selectedEpisode.videoId)}
+                      className="w-full h-full"
+                      allowFullScreen
+                      allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={selectedEpisode.title}
+                    />
                   </div>
 
                   {/* Навигация */}
