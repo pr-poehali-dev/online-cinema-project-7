@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
+import HlsPlayer from "@/components/HlsPlayer";
 
 type IconName = Parameters<typeof Icon>[0]["name"];
 
@@ -7,17 +8,18 @@ const HERO_IMG = "https://cdn.poehali.dev/projects/73d70427-a8fe-40ee-8a88-73289
 const GEROI_IMG = "https://cdn.poehali.dev/projects/73d70427-a8fe-40ee-8a88-73289f863f59/bucket/2beab79f-b623-4060-a97a-3bb65a2ab621.jpeg";
 
 const TV_CHANNELS = [
-  { id: 1, name: "Россия 1", emoji: "📺", color: "#e63946", desc: "Главный федеральный канал" },
-  { id: 2, name: "НТВ", emoji: "🎙️", color: "#457b9d", desc: "Новости и программы" },
-  { id: 3, name: "Россия 24", emoji: "📡", color: "#1d3557", desc: "Новости 24 часа" },
-  { id: 4, name: "Пятый канал", emoji: "5️⃣", color: "#2d6a4f", desc: "Документальные фильмы" },
-  { id: 5, name: "РЕН ТВ", emoji: "🔍", color: "#6d2b8b", desc: "Расследования и репортажи" },
-  { id: 6, name: "СТС", emoji: "🎭", color: "#f4a261", desc: "Сериалы и развлечения" },
-  { id: 7, name: "ТНТ", emoji: "😂", color: "#e9c46a", desc: "Юмор и комедии" },
-  { id: 8, name: "Матч ТВ", emoji: "⚽", color: "#2196F3", desc: "Спорт и трансляции" },
-  { id: 9, name: "Культура", emoji: "🎨", color: "#8d5524", desc: "Театр, музыка, кино" },
-  { id: 10, name: "ОТР", emoji: "🏛️", color: "#3d405b", desc: "Общественное телевидение" },
-  { id: 11, name: "ТВК", emoji: "📻", color: "#e76f51", desc: "Региональное вещание" },
+  { id: 1,  name: "Первый канал",  emoji: "1️⃣", color: "#e63946", desc: "Главный федеральный канал", stream: "http://rt-vlg-nn-htlive.cdn.ngenix.net/hls/CH_R03_OTT_VLG_NN_1TV/variant.m3u8?version=2" },
+  { id: 2,  name: "Россия 1",      emoji: "📺", color: "#c0392b", desc: "ВГТРК · Новости и сериалы",  stream: "https://vgtrkregion-reg.cdnvideo.ru/vgtrk/0/russia1-hd/index.m3u8" },
+  { id: 3,  name: "НТВ",           emoji: "🎙️", color: "#457b9d", desc: "Новости и программы",        stream: "https://zabava-htlive.cdn.ngenix.net/hls/CH_NTV/variant.m3u8" },
+  { id: 4,  name: "Россия 24",     emoji: "📡", color: "#1d3557", desc: "Новости 24 часа",            stream: "https://vgtrkregion-reg.cdnvideo.ru/vgtrk/abakan/russia24-sd/index.m3u8" },
+  { id: 5,  name: "Пятый канал",   emoji: "5️⃣", color: "#2d6a4f", desc: "Документальные фильмы",     stream: "https://zabava-htlive.cdn.ngenix.net/hls/CH_5TV/variant.m3u8" },
+  { id: 6,  name: "РЕН ТВ",        emoji: "🔍", color: "#6d2b8b", desc: "Расследования и репортажи",  stream: "https://zabava-htlive.cdn.ngenix.net/hls/CH_RENTV/variant.m3u8" },
+  { id: 7,  name: "СТС",           emoji: "🎭", color: "#f4a261", desc: "Сериалы и развлечения",      stream: "https://zabava-htlive.cdn.ngenix.net/hls/CH_STS/variant.m3u8" },
+  { id: 8,  name: "ТНТ",           emoji: "😂", color: "#e9c46a", desc: "Юмор и комедии",             stream: "https://streaming.televizor-24-tochka.ru/live/38.m3u8" },
+  { id: 9,  name: "Культура",      emoji: "🎨", color: "#8d5524", desc: "Театр, музыка, кино",        stream: "https://vgtrkregion-reg.cdnvideo.ru/vgtrk/0/kultura-hd/index.m3u8" },
+  { id: 10, name: "Матч ТВ",       emoji: "⚽", color: "#2196F3", desc: "Спорт и трансляции",         stream: null },
+  { id: 11, name: "ОТР",           emoji: "🏛️", color: "#3d405b", desc: "Общественное телевидение",   stream: null },
+  { id: 12, name: "Карусель",      emoji: "🎠", color: "#e91e8c", desc: "Детский канал",              stream: "https://zabava-htlive.cdn.ngenix.net/hls/CH_KARUSEL/variant.m3u8" },
 ];
 
 function vkEmbed(videoId: string): string {
@@ -111,6 +113,7 @@ type Section = "home" | "tv" | "cartoons" | "schedule";
 export default function Index() {
   const [activeSection, setActiveSection] = useState<Section>("home");
   const [selectedEpisode, setSelectedEpisode] = useState<{ ep: number; title: string; videoId: string } | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<typeof TV_CHANNELS[0] | null>(null);
   const [selectedSeason, setSelectedSeason] = useState<1 | 2>(1);
   const [scheduleChannel, setScheduleChannel] = useState("Россия 1");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -289,18 +292,84 @@ export default function Index() {
         {/* ===== TV ===== */}
         {activeSection === "tv" && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 animate-fade-in">
+
+            {/* TV Player Modal */}
+            {selectedChannel && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                style={{ background: "rgba(0,0,0,0.95)", backdropFilter: "blur(16px)" }}
+                onClick={(e) => { if (e.target === e.currentTarget) setSelectedChannel(null); }}
+              >
+                <div className="w-full max-w-4xl animate-scale-in">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                        style={{ background: `${selectedChannel.color}33`, border: `1px solid ${selectedChannel.color}55` }}
+                      >
+                        {selectedChannel.emoji}
+                      </div>
+                      <div>
+                        <h3 className="font-montserrat font-bold text-white text-xl">{selectedChannel.name}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                          <span className="text-red-400 text-xs font-medium">ПРЯМОЙ ЭФИР</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedChannel(null)}
+                      className="w-10 h-10 rounded-full glass flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                    >
+                      <Icon name="X" size={20} />
+                    </button>
+                  </div>
+                  <div className="rounded-2xl overflow-hidden bg-black" style={{ aspectRatio: "16/9" }}>
+                    {selectedChannel.stream
+                      ? <HlsPlayer key={selectedChannel.id} src={selectedChannel.stream} className="w-full h-full" />
+                      : (
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                          <Icon name="Tv" size={48} className="text-gray-600" />
+                          <p className="text-gray-500 text-sm">Трансляция для этого канала скоро появится</p>
+                        </div>
+                      )
+                    }
+                  </div>
+                  {/* Переключение каналов */}
+                  <div className="flex gap-2 mt-4 overflow-x-auto scrollbar-hide pb-1">
+                    {TV_CHANNELS.filter(c => c.stream).map(ch => (
+                      <button
+                        key={ch.id}
+                        onClick={() => setSelectedChannel(ch)}
+                        className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
+                          selectedChannel.id === ch.id
+                            ? "text-white"
+                            : "glass text-gray-400 hover:text-white"
+                        }`}
+                        style={selectedChannel.id === ch.id ? { background: `${ch.color}44`, border: `1px solid ${ch.color}66` } : {}}
+                      >
+                        <span>{ch.emoji}</span>
+                        <span className="font-medium">{ch.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-1 h-8 rounded-full" style={{ background: "linear-gradient(to bottom, #ff5c1a, #a855f7)" }} />
                 <h1 className="font-montserrat font-black text-3xl text-white">ТВ-каналы</h1>
               </div>
-              <p className="text-gray-400 ml-4">Федеральные каналы России</p>
+              <p className="text-gray-400 ml-4">Федеральные каналы России · Прямой эфир</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TV_CHANNELS.map((ch) => (
                 <div
                   key={ch.id}
+                  onClick={() => setSelectedChannel(ch)}
                   className="channel-card card-glow rounded-2xl p-5 flex items-center gap-4 cursor-pointer relative overflow-hidden group"
                 >
                   <div
@@ -314,8 +383,10 @@ export default function Index() {
                     <p className="text-gray-500 text-xs truncate">{ch.desc}</p>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 live-badge" />
-                    <span className="text-green-400 text-xs font-medium">LIVE</span>
+                    {ch.stream
+                      ? <><span className="w-1.5 h-1.5 rounded-full bg-green-400 live-badge" /><span className="text-green-400 text-xs font-medium">LIVE</span></>
+                      : <span className="text-gray-600 text-xs">Скоро</span>
+                    }
                   </div>
                   <div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
@@ -325,7 +396,7 @@ export default function Index() {
                       <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center neon-glow">
                         <Icon name="Play" size={20} className="text-white ml-1" />
                       </div>
-                      <span className="text-white text-sm font-medium">Смотреть</span>
+                      <span className="text-white text-sm font-medium">{ch.stream ? "Смотреть" : "Скоро"}</span>
                     </div>
                   </div>
                 </div>
@@ -336,7 +407,7 @@ export default function Index() {
               <div className="flex items-start gap-3">
                 <Icon name="Info" size={18} className="text-orange-400 mt-0.5 flex-shrink-0" />
                 <p className="text-gray-300 text-sm">
-                  Трансляция каналов будет подключена в следующем обновлении. Пока можно посмотреть{" "}
+                  Матч ТВ и ОТР — трансляции появятся позже. Также можно посмотреть{" "}
                   <button onClick={() => setActiveSection("schedule")} className="text-orange-400 hover:text-orange-300 underline">
                     программу передач
                   </button>.
