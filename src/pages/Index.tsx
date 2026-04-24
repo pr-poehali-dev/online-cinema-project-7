@@ -4,7 +4,7 @@ import Icon from "@/components/ui/icon";
 type IconName = Parameters<typeof Icon>[0]["name"];
 
 const HERO_IMG = "https://cdn.poehali.dev/projects/73d70427-a8fe-40ee-8a88-73289f863f59/files/56603231-4ab2-4a2d-b7e9-44a0a3d01b79.jpg";
-const GEROI_IMG = "https://cdn.poehali.dev/projects/73d70427-a8fe-40ee-8a88-73289f863f59/files/b84f991e-e4e8-4e25-9ccb-8135aaca3120.jpg";
+const GEROI_IMG = "https://cdn.poehali.dev/projects/73d70427-a8fe-40ee-8a88-73289f863f59/bucket/2beab79f-b623-4060-a97a-3bb65a2ab621.jpeg";
 
 const TV_CHANNELS = [
   { id: 1, name: "Россия 1", emoji: "📺", color: "#e63946", desc: "Главный федеральный канал" },
