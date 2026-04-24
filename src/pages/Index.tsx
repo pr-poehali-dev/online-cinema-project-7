@@ -352,13 +352,14 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Video player modal */}
+            {/* Video modal */}
             {selectedEpisode && (
               <div
                 className="fixed inset-0 z-50 flex items-center justify-center p-4"
                 style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(16px)" }}
+                onClick={(e) => { if (e.target === e.currentTarget) setSelectedEpisode(null); }}
               >
-                <div className="w-full max-w-4xl animate-scale-in">
+                <div className="w-full max-w-lg animate-scale-in">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <div className="text-gray-400 text-sm mb-1">Геройчики · Серия {selectedEpisode.ep}</div>
@@ -371,15 +372,50 @@ export default function Index() {
                       <Icon name="X" size={20} />
                     </button>
                   </div>
-                  <div className="rounded-2xl overflow-hidden bg-black" style={{ aspectRatio: "16/9" }}>
-                    <iframe
-                      src={selectedEpisode.url}
-                      className="w-full h-full"
-                      allowFullScreen
-                      allow="autoplay; fullscreen"
-                      title={selectedEpisode.title}
-                    />
+
+                  {/* Карточка серии */}
+                  <div
+                    className="rounded-2xl overflow-hidden relative group cursor-pointer"
+                    style={{ background: "linear-gradient(135deg, #0d1b2a, #1a0a2e)", border: "1px solid rgba(255,92,26,0.2)" }}
+                    onClick={() => window.open(selectedEpisode.url, "_blank")}
+                  >
+                    <div className="relative h-56 overflow-hidden">
+                      <img
+                        src={GEROI_IMG}
+                        alt={selectedEpisode.title}
+                        className="w-full h-full object-cover object-top opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
+                      />
+                      <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)" }} />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div
+                          className="w-20 h-20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform neon-glow"
+                          style={{ background: "linear-gradient(135deg, #ff5c1a, #ff8c42)" }}
+                        >
+                          <Icon name="Play" size={32} className="text-white ml-1" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="text-orange-400 text-xs font-medium mb-1">Серия {selectedEpisode.ep}</div>
+                        <div className="text-white font-montserrat font-bold text-lg">{selectedEpisode.title}</div>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="bg-orange-500/20 text-orange-300 text-xs px-2 py-0.5 rounded-full border border-orange-500/30">ВКонтакте Видео</span>
+                        <span className="text-gray-500 text-xs">Геройчики · 1 сезон</span>
+                      </div>
+                      <button
+                        className="w-full py-3 rounded-xl font-montserrat font-bold text-white text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.02] neon-glow"
+                        style={{ background: "linear-gradient(135deg, #ff5c1a, #a855f7)" }}
+                        onClick={(e) => { e.stopPropagation(); window.open(selectedEpisode.url, "_blank"); }}
+                      >
+                        <Icon name="ExternalLink" size={16} />
+                        Смотреть на VK Video
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Навигация */}
                   <div className="flex items-center justify-between mt-4">
                     <button
                       disabled={selectedEpisode.ep <= 1}
@@ -389,6 +425,7 @@ export default function Index() {
                       <Icon name="ChevronLeft" size={16} />
                       Предыдущая
                     </button>
+                    <span className="text-gray-600 text-sm">{selectedEpisode.ep} / {GEROI_SEASON1.length}</span>
                     <button
                       disabled={selectedEpisode.ep >= GEROI_SEASON1.length}
                       onClick={() => setSelectedEpisode(GEROI_SEASON1[selectedEpisode.ep])}
